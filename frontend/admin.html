@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - BookSmart</title>
+    <script defer src="dashboard.js"></script>
+    <script src="loginStatus.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -36,7 +38,7 @@
                     <input type="text" id="search-input" placeholder="Search...">
                     <button><i class="fas fa-search"></i></button>
                 </div>
-            
+                <p id="user-status">Checking login status...</p>
             </header>
 
             <!-- Books Section -->
@@ -229,6 +231,28 @@
                     <button class="pagination-btn" disabled><i class="fas fa-chevron-right"></i></button>
                 </div>
             </section>
+            
+            <!-- User List Section (from second file) -->
+            <section id="user-list" class="admin-section">
+                <div class="section-header">
+                    <h2>User List</h2>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList">
+                            <!-- This will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -246,7 +270,5 @@
 
     <div id="modal-overlay" class="hidden"></div>
 
-    <!-- Scripts -->
-    <script src="js/admin.js"></script>
 </body>
 </html>
