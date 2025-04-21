@@ -1,0 +1,169 @@
+<!-- checkout.html (Updated Checkout Page) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - BookSmart</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>BookSmart</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="browse.html">Browse</a></li>
+                <li><a href="#" id="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="checkout-section">
+            <div class="container">
+                <h2>Checkout</h2>
+                
+                <div class="checkout-container">
+                    <!-- Cart Items Section -->
+                    <div class="cart-items-container">
+                        <h3>Your Cart</h3>
+                        <div id="empty-cart-message" class="hidden">
+                            <p>Your cart is empty. <a href="browse.html">Continue shopping</a></p>
+                        </div>
+                        
+                        <div id="cart-items-list">
+                            <!-- Cart items will be dynamically added here -->
+                        </div>
+                        
+                        <div class="cart-actions">
+                            <a href="browse.html" class="btn btn-secondary">Continue Shopping</a>
+                            <button id="clear-cart" class="btn btn-danger">Clear Cart</button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Section -->
+                    <div class="payment-container">
+                        <div class="order-summary">
+                            <h3>Order Summary</h3>
+                            <div class="summary-totals">
+                                <div class="summary-row">
+                                    <span>Subtotal</span>
+                                    <span id="subtotal">$0.00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tax (8%)</span>
+                                    <span id="tax">$0.00</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total</span>
+                                    <span id="total">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-section">
+                            <h3>Payment Information</h3>
+                            <div class="payment-methods">
+                                <div class="payment-method">
+                                    <input type="radio" id="credit-card" name="payment-method" checked>
+                                    <label for="credit-card">Credit Card</label>
+                                </div>
+                                <div class="payment-method">
+                                    <input type="radio" id="paypal" name="payment-method">
+                                    <label for="paypal">PayPal</label>
+                                </div>
+                            </div>
+
+                            <form id="payment-form">
+                                <div id="credit-card-form">
+                                    <div class="form-group">
+                                        <label for="card-number">Card Number</label>
+                                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="expiry">Expiry Date</label>
+                                            <input type="text" id="expiry" placeholder="MM/YY" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" id="cvv" placeholder="123" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card-name">Name on Card</label>
+                                        <input type="text" id="card-name" required>
+                                    </div>
+                                </div>
+
+                                <div id="paypal-form" class="hidden">
+                                    <p>You will be redirected to PayPal to complete your payment.</p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary checkout-btn" id="place-order-btn">Place Order</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BookSmart</h3>
+                    <p>Your trusted online bookstore since 2025.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="browse.html">Browse</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-envelope"></i> info@BookSmart.com</p>
+                    <p><i class="fas fa-phone"></i> (123) 456-7890</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 BookSmart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="order-confirmation" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Order Confirmed!</h3>
+            <p>Thank you for your purchase. Your order has been placed successfully.</p>
+            <p>Order #: <span id="order-number"></span></p>
+            <button class="btn btn-primary" id="continue-shopping-btn">Continue Shopping</button>
+        </div>
+    </div>
+    <div id="modal-overlay" class="hidden"></div>
+
+</body>
+</html>
