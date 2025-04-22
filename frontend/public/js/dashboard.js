@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderUsersTable(users);
                 renderUserList(users);
             })
-            .catch(error => {
-                console.error('Error loading users:', error);
-                alert('Failed to load users. Please try again.');
-            });
+            //.catch(error => {
+            //    console.error('Error loading users:', error);
+            //    alert('Failed to load users. Please try again.');
+            //});
     }
     
     function renderUsersTable(users) {
