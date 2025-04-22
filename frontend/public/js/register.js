@@ -34,12 +34,12 @@ async function register(event) {
             console.log(result);
             if(result.success == true){
                alert(`${result.message} for ${result.username}`);
-               window.location.href = "frontpage.html";
+               window.location.href = "index.html";
             } else {
                alert(`${result.message}`);
             }
         } else {
-            // Show error alert if registration fails
+            // Show error alert if registration failss
             console.log("response not OK");
             console.log(result);
             console.log("Failed to register:", response.statusText);

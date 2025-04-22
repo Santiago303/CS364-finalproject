@@ -23,8 +23,13 @@ async function login(event) {
         if (response.ok) {
             // Redirect to the frontpage on successful login
             alert("user is logged in");
-            window.location.href = "frontpage.html";
-        } else {
+            window.location.href = "browse.html";
+
+        }else if(loginData.username=="admin" && response.ok ){
+            alert("admin is logged in");
+            window.location.href = "admin.html";
+        } 
+        else {
             // Show an alert box if login fails
             alert(result.error || "Login failed. Please try again." || `${user}`);
         }
