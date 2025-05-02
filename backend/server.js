@@ -81,6 +81,49 @@ app.get('/debug', (req, res) => {
 
 // Book API Endpoints for server.js
 
+// In your server.js or routes file
+app.get('/books/:id/inventory', async (req, res) => {
+  const bookId = parseInt(req.params.id);
+  console.log(bookId);
+  if (isNaN(bookId)) {
+      return res.status(400).json({ error: 'Invalid book ID' });
+  }
+  
+  try {
+      // Log the request for debugging
+      console.log(`Checking inventory for book ID: ${bookId}`);
+      
+      const [rows] = await pool.query(
+          'SELECT book_id, title, stock FROM books WHERE book_id = ?',
+          [bookId]
+      );
+      
+      console.log('Query result:', rows);
+      
+      if (rows.length === 0) {
+          return res.status(404).json({ 
+              error: 'Book not found',
+              bookId: bookId
+          });
+      }
+      
+      res.json({ 
+          book_id: bookId,
+          title: rows[0].title,
+          stock: rows[0].stock 
+      });
+  } catch (error) {
+      console.error('Error checking inventory:', error);
+      res.status(500).json({ 
+          error: 'Server error',
+          message: error.message,
+          bookId: bookId
+      });
+  }
+});
+
+
+
 // GET all books
 app.get('/books', async (req, res) => {
   try {
@@ -218,5 +261,86 @@ app.post('/books/truncate', async (req, res) => {
     res.status(500).json({ error: 'Failed to truncate books table' });
   }
 });
+
+// In your server.js or routes/orders.js file
+
+// Process order and update inventory
+app.post('/api/orders', async (req, res) => {
+  const { items, paymentMethod, total } = req.body;
+  
+  // Get user ID from session (assuming you have authentication)
+  // const userId = req.session.userId;
+  const userId = 1; // For testing without authentication
+  
+  // Start a database transaction
+  const connection = await pool.getConnection();
+  
+  try {
+      await connection.beginTransaction();
+      
+      // 1. Create order record
+      const [orderResult] = await connection.query(
+          'INSERT INTO orders (user_id, total_amount, payment_method, status) VALUES (?, ?, ?, ?)',
+          [userId, total, paymentMethod, 'completed']
+      );
+      
+      const orderId = orderResult.insertId;
+      
+      // 2. Process each item in the order
+      for (const item of items) {
+          // Check if there's enough inventory
+          const [inventoryResult] = await connection.query(
+              'SELECT stock FROM books WHERE id = ?',
+              [item.id]
+          );
+          
+          if (inventoryResult.length === 0) {
+              throw new Error(`Book with ID ${item.id} not found`);
+          }
+          
+          const currentStock = inventoryResult[0].stock;
+          
+          if (currentStock < item.quantity) {
+              throw new Error(`Not enough inventory for book ID ${item.id}. Only ${currentStock} available.`);
+          }
+          
+          // Add item to order_items table
+          await connection.query(
+              'INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)',
+              [orderId, item.id, item.quantity, item.price]
+          );
+          
+          // Update inventory
+          await connection.query(
+              'UPDATE books SET stock = stock - ? WHERE id = ?',
+              [item.quantity, item.id]
+          );
+      }
+      
+      // Commit the transaction
+      await connection.commit();
+      
+      // Send success response
+      res.status(201).json({
+          success: true,
+          message: 'Order processed successfully',
+          orderId: orderId
+      });
+      
+  } catch (error) {
+      // Rollback in case of error
+      await connection.rollback();
+      console.error('Order processing error:', error);
+      
+      res.status(400).json({
+          success: false,
+          error: error.message || 'Failed to process order'
+      });
+  } finally {
+      // Release the connection
+      connection.release();
+  }
+});
+
 
 app.listen(3000, () => console.log("Server running on port 3000"));

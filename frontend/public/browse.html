@@ -15,9 +15,10 @@
                 <h1>BookSmart</h1>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="home.html" >About Us</a></li>
                 <li><a href="browse.html" class="active">Browse</a></li>
                 <li><a href="checkout.html" id="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a></li>
+                <li><a href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
             <div class="burger">
                 <div class="line1"></div>
@@ -126,6 +127,30 @@
             </div>
         </div>
     </footer>
+    <script>
+        // Add this to your script.js file or in a <script> tag at the bottom of your HTML
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutButton = document.getElementById('logout-button');
+    
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to logout?')) {
+                // If user confirms, redirect to login page
+                window.location.href = 'index.html';
+                
+                // In a real application, you would also need to call a logout API endpoint
+                // to invalidate the user's session on the server
+                // Example: fetch('/api/logout', { method: 'POST' });
+            }
+        });
+    }
+});
+    </script>
 
+<script src="js/script.js"></script>
+<script src="js/browse.js"></script>
 </body>
 </html>

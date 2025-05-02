@@ -915,3 +915,10 @@ footer {
         transform: translateX(0);
     }
 }
+#logout-button {
+    color: var(--accent-color);
+}
+
+#logout-button:hover {
+    color: var(--danger-color);
+}
