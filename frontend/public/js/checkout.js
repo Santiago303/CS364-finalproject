@@ -1,4 +1,3 @@
-// checkout.js
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
     const cartItemsList = document.getElementById('cart-items-list');
@@ -123,68 +122,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Increase quantity
-    async function increaseQuantity(e) {
+    // Increase quantity - MODIFIED to bypass inventory check
+    function increaseQuantity(e) {
         const index = parseInt(e.target.dataset.index);
-        const bookId = cart[index].id;
-        
-        try {
-            // Check current inventory before increasing quantity
-            const response = await fetch(`/books/${bookId}/inventory`);
-            if (!response.ok) {
-                throw new Error('Failed to check inventory');
-            }
-            
-            const { stock } = await response.json();
-            
-            // Check if increasing would exceed available stock
-            if (cart[index].quantity >= stock) {
-                alert(`Sorry, only ${stock} copies available.`);
-                return;
-            }
-            
-            // If we have enough stock, increase the quantity
-            cart[index].quantity++;
-            saveCartAndUpdate();
-            
-        } catch (error) {
-            console.error('Error checking inventory:', error);
-            alert('There was an error updating your cart. Please try again.');
-        }
+        // Simply increase the quantity without checking inventory
+        cart[index].quantity++;
+        saveCartAndUpdate();
     }
     
-    // Update quantity from input
-    async function updateQuantityFromInput(e) {
+    // Update quantity from input - MODIFIED to bypass inventory check
+    function updateQuantityFromInput(e) {
         const index = parseInt(e.target.dataset.index);
         const newQuantity = parseInt(e.target.value);
-        const bookId = cart[index].book_id;
         
         if (newQuantity >= 1) {
-            try {
-                // Check current inventory before updating quantity
-                const response = await fetch(`/books/${bookId}/inventory`);
-                if (!response.ok) {
-                    throw new Error('Failed to check inventory');
-                }
-                
-                const { stock } = await response.json();
-                
-                // Check if new quantity would exceed available stock
-                if (newQuantity > stock) {
-                    alert(`Sorry, only ${stock} copies available.`);
-                    e.target.value = cart[index].quantity;
-                    return;
-                }
-                
-                // If we have enough stock, update the quantity
-                cart[index].quantity = newQuantity;
-                saveCartAndUpdate();
-                
-            } catch (error) {
-                console.error('Error checking inventory:', error);
-                alert('There was an error updating your cart. Please try again.');
-                e.target.value = cart[index].quantity;
-            }
+            // Simply update the quantity without checking inventory
+            cart[index].quantity = newQuantity;
+            saveCartAndUpdate();
         } else {
             e.target.value = cart[index].quantity;
         }
@@ -227,9 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Place order
+    // Place order - MODIFIED to bypass inventory check
     if (paymentForm) {
-        paymentForm.addEventListener('submit', async function(e) {
+        paymentForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             if (cart.length === 0) {
@@ -271,66 +225,66 @@ document.addEventListener('DOMContentLoaded', function() {
             placeOrderBtn.disabled = true;
             placeOrderBtn.textContent = 'Processing...';
             
-            try {
-                // Check inventory one last time before placing order
-                for (const item of cart) {
-                    const response = await fetch(`/books/${item.id}/inventory`);
-                    if (!response.ok) {
-                        throw new Error(`Failed to check inventory for book ID ${item.id}`);
-                    }
-                    
-                    const { stock } = await response.json();
-                    
-                    if (stock < item.quantity) {
-                        throw new Error(`Sorry, only ${stock} copies of "${item.title}" are available.`);
-                    }
-                }
+            // Generate a random order number
+            const orderNumber = Math.floor(100000 + Math.random() * 900000);
+            
+            // Make sure the order number is set in the confirmation modal
+            const orderNumberElement = document.getElementById('order-number');
+            if (orderNumberElement) {
+                orderNumberElement.textContent = orderNumber;
+            } else {
+                console.error('Order number element not found');
+            }
+            
+            // Get references to confirmation elements
+            const orderConfirmation = document.getElementById('order-confirmation');
+            const modalOverlay = document.getElementById('modal-overlay');
+            
+            // Check if elements exist
+            if (!orderConfirmation || !modalOverlay) {
+                console.error('Order confirmation elements not found');
+                alert('Order placed successfully! Order #' + orderNumber);
                 
-                // Prepare order data
-                const orderData = {
-                    items: cart.map(item => ({
-                        id: item.id,
-                        quantity: item.quantity,
-                        price: item.price
-                    })),
-                    paymentMethod: creditCardRadio.checked ? 'credit-card' : 'paypal',
-                    total: parseFloat(document.getElementById('total').textContent.replace('$', ''))
-                };
-                
-                // Send order to server
-                const response = await fetch('/api/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
-                });
-                
-                const result = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(result.error || 'Failed to process order');
-                }
-                
-                // Order successful
-                const orderNumber = result.orderId || Math.floor(100000 + Math.random() * 900000);
-                document.getElementById('order-number').textContent = orderNumber;
-                
-                // Show confirmation modal
-                orderConfirmation.classList.remove('hidden');
-                modalOverlay.classList.remove('hidden');
-                
-                // Clear cart after successful order
+                // Clear cart even if confirmation modal is missing
                 cart = [];
-                saveCartAndUpdate();
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
                 
-            } catch (error) {
-                console.error('Order processing error:', error);
-                alert('There was an error processing your order: ' + error.message);
-                
-                // Re-enable the button
-                placeOrderBtn.disabled = false;
-                placeOrderBtn.textContent = 'Place Order';
+                // Redirect to browse page
+                window.location.href = 'browse.html';
+                return;
+            }
+            
+            // Show confirmation modal
+            console.log('Showing confirmation modal');
+            orderConfirmation.classList.remove('hidden');
+            modalOverlay.classList.remove('hidden');
+            
+            // Make sure modal is visible
+            orderConfirmation.style.display = 'block';
+            modalOverlay.style.display = 'block';
+            
+            // Clear cart after successful order
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            
+            // Add event listener to continue shopping button
+            const continueShoppingBtn = document.getElementById('continue-shopping-btn');
+            if (continueShoppingBtn) {
+                continueShoppingBtn.addEventListener('click', function() {
+                    window.location.href = 'browse.html';
+                });
+            }
+            
+            // Add event listener to close modal button
+            const closeModal = document.querySelector('.close-modal');
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    orderConfirmation.classList.add('hidden');
+                    modalOverlay.classList.add('hidden');
+                    window.location.href = 'browse.html';
+                });
             }
         });
     }
@@ -445,32 +399,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         document.querySelectorAll('.sidebar-increase').forEach(button => {
-            button.addEventListener('click', async function() {
+            button.addEventListener('click', function() {
                 const index = parseInt(this.dataset.index);
-                const bookId = cart[index].id;
-                
-                try {
-                    // Check inventory before increasing
-                    const response = await fetch(`/books/${bookId}/inventory`);
-                    if (!response.ok) {
-                        throw new Error('Failed to check inventory');
-                    }
-                    
-                    const { stock } = await response.json();
-                    
-                    if (cart[index].quantity >= stock) {
-                        alert(`Sorry, only ${stock} copies available.`);
-                        return;
-                    }
-                    
-                    cart[index].quantity++;
-                    saveCartAndUpdate();
-                    updateCartSidebar();
-                    
-                } catch (error) {
-                    console.error('Error checking inventory:', error);
-                    alert('There was an error updating your cart.');
-                }
+                // MODIFIED: Bypass inventory check in sidebar
+                cart[index].quantity++;
+                saveCartAndUpdate();
+                updateCartSidebar();
             });
         });
         

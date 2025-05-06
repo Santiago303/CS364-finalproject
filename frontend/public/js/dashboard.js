@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error loading books:', error);
                 // Load sample data if API fails
-                loadSampleBooks();
+                //loadSampleBooks();
             });
     }
     
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error loading users:', error);
                 // Load sample data if API fails
-                loadSampleUsers();
+                //loadSampleUsers();
             });
     }
     
